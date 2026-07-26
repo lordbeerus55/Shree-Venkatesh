@@ -1,0 +1,132 @@
+[
+  {
+    "id": 1,
+    "name": "Kalyan",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "03:55 PM", "close": "05:55 PM", "editId": 597 },
+      { "day": "Tuesday", "active": true, "open": "03:55 PM", "close": "05:55 PM", "editId": 598 },
+      { "day": "Wednesday", "active": true, "open": "03:55 PM", "close": "05:55 PM", "editId": 599 },
+      { "day": "Thursday", "active": true, "open": "03:55 PM", "close": "05:55 PM", "editId": 600 },
+      { "day": "Friday", "active": true, "open": "03:55 PM", "close": "05:55 PM", "editId": 601 },
+      { "day": "Saturday", "active": true, "open": "03:55 PM", "close": "05:55 PM", "editId": 602 },
+      { "day": "Sunday", "active": false, "open": "03:55 PM", "close": "05:55 PM", "editId": 596 }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Kalyan night",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "09:25 PM", "close": "11:25 PM", "editId": 814 },
+      { "day": "Tuesday", "active": true, "open": "09:25 PM", "close": "11:25 PM", "editId": 815 },
+      { "day": "Wednesday", "active": true, "open": "09:25 PM", "close": "11:25 PM", "editId": 816 },
+      { "day": "Thursday", "active": true, "open": "09:25 PM", "close": "11:25 PM", "editId": 817 },
+      { "day": "Friday", "active": true, "open": "09:25 PM", "close": "11:25 PM", "editId": 818 },
+      { "day": "Saturday", "active": false, "open": "09:25 PM", "close": "11:25 PM", "editId": 819 },
+      { "day": "Sunday", "active": false, "open": "09:25 PM", "close": "11:25 PM", "editId": 813 }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Madhur Day",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "01:25 PM", "close": "02:25 PM", "editId": 632 },
+      { "day": "Tuesday", "active": true, "open": "01:25 PM", "close": "02:25 PM", "editId": 633 },
+      { "day": "Wednesday", "active": true, "open": "01:25 PM", "close": "02:25 PM", "editId": 634 },
+      { "day": "Thursday", "active": true, "open": "01:25 PM", "close": "02:25 PM", "editId": 635 },
+      { "day": "Friday", "active": true, "open": "01:25 PM", "close": "02:25 PM", "editId": 636 },
+      { "day": "Saturday", "active": true, "open": "01:25 PM", "close": "02:25 PM", "editId": 637 },
+      { "day": "Sunday", "active": true, "open": "01:25 PM", "close": "02:25 PM", "editId": 631 }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Madhur Night",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "08:25 PM", "close": "10:25 PM", "editId": 583 },
+      { "day": "Tuesday", "active": true, "open": "08:25 PM", "close": "10:25 PM", "editId": 584 },
+      { "day": "Wednesday", "active": true, "open": "08:25 PM", "close": "10:25 PM", "editId": 585 },
+      { "day": "Thursday", "active": true, "open": "08:25 PM", "close": "10:25 PM", "editId": 586 },
+      { "day": "Friday", "active": true, "open": "08:25 PM", "close": "10:25 PM", "editId": 587 },
+      { "day": "Saturday", "active": true, "open": "08:25 PM", "close": "10:25 PM", "editId": 588 },
+      { "day": "Sunday", "active": false, "open": "08:25 PM", "close": "10:25 PM", "editId": 582 }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "MAHARANI",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "12:05 PM", "close": "02:05 PM", "editId": 737 },
+      { "day": "Tuesday", "active": true, "open": "12:05 PM", "close": "02:05 PM", "editId": 738 },
+      { "day": "Wednesday", "active": true, "open": "12:05 PM", "close": "02:05 PM", "editId": 739 },
+      { "day": "Thursday", "active": true, "open": "12:05 PM", "close": "02:05 PM", "editId": 740 },
+      { "day": "Friday", "active": true, "open": "12:05 PM", "close": "02:05 PM", "editId": 741 },
+      { "day": "Saturday", "active": true, "open": "12:05 PM", "close": "02:05 PM", "editId": 742 },
+      { "day": "Sunday", "active": true, "open": "12:05 PM", "close": "02:05 PM", "editId": 736 }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "MAHARANI DAY",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "05:05 PM", "close": "07:05 PM", "editId": 744 },
+      { "day": "Tuesday", "active": true, "open": "05:05 PM", "close": "07:05 PM", "editId": 745 },
+      { "day": "Wednesday", "active": true, "open": "05:05 PM", "close": "07:05 PM", "editId": 746 },
+      { "day": "Thursday", "active": true, "open": "05:05 PM", "close": "07:05 PM", "editId": 747 },
+      { "day": "Friday", "active": true, "open": "05:05 PM", "close": "07:05 PM", "editId": 748 },
+      { "day": "Saturday", "active": true, "open": "05:05 PM", "close": "07:05 PM", "editId": 749 },
+      { "day": "Sunday", "active": true, "open": "05:05 PM", "close": "07:05 PM", "editId": 743 }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "MAHARANI NIGHT",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "10:05 PM", "close": "11:50 PM", "editId": 751 },
+      { "day": "Tuesday", "active": true, "open": "10:05 PM", "close": "11:50 PM", "editId": 752 },
+      { "day": "Wednesday", "active": true, "open": "10:05 PM", "close": "11:50 PM", "editId": 753 },
+      { "day": "Thursday", "active": true, "open": "10:05 PM", "close": "11:50 PM", "editId": 754 },
+      { "day": "Friday", "active": true, "open": "10:05 PM", "close": "11:50 PM", "editId": 755 },
+      { "day": "Saturday", "active": true, "open": "10:05 PM", "close": "11:50 PM", "editId": 756 },
+      { "day": "Sunday", "active": true, "open": "10:05 PM", "close": "11:50 PM", "editId": 750 }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Main Bazar",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "09:50 PM", "close": "11:55 PM", "editId": 534 },
+      { "day": "Tuesday", "active": true, "open": "09:50 PM", "close": "11:55 PM", "editId": 535 },
+      { "day": "Wednesday", "active": true, "open": "09:50 PM", "close": "11:55 PM", "editId": 536 },
+      { "day": "Thursday", "active": true, "open": "09:50 PM", "close": "11:55 PM", "editId": 537 },
+      { "day": "Friday", "active": true, "open": "09:50 PM", "close": "11:55 PM", "editId": 538 },
+      { "day": "Saturday", "active": false, "open": "09:50 PM", "close": "11:55 PM", "editId": 539 },
+      { "day": "Sunday", "active": false, "open": "09:50 PM", "close": "11:55 PM", "editId": 533 }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Milan Day",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "03:00 PM", "close": "05:00 PM", "editId": 625 },
+      { "day": "Tuesday", "active": true, "open": "03:00 PM", "close": "05:00 PM", "editId": 626 },
+      { "day": "Wednesday", "active": true, "open": "03:00 PM", "close": "05:00 PM", "editId": 627 },
+      { "day": "Thursday", "active": true, "open": "03:00 PM", "close": "05:00 PM", "editId": 628 },
+      { "day": "Friday", "active": true, "open": "03:00 PM", "close": "05:00 PM", "editId": 629 },
+      { "day": "Saturday", "active": true, "open": "03:00 PM", "close": "05:00 PM", "editId": 630 },
+      { "day": "Sunday", "active": false, "open": "03:00 PM", "close": "05:00 PM", "editId": 624 }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Milan Night",
+    "schedule": [
+      { "day": "Monday", "active": true, "open": "09:00 PM", "close": "11:00 PM", "editId": 569 },
+      { "day": "Tuesday", "active": true, "open": "09:00 PM", "close": "11:00 PM", "editId": 570 },
+      { "day": "Wednesday", "active": true, "open": "09:00 PM", "close": "11:00 PM", "editId": 571 },
+      { "day": "Thursday", "active": true, "open": "09:00 PM", "close": "11:00 PM", "editId": 572 },
+      { "day": "Friday", "active": true, "open": "09:00 PM", "close": "11:00 PM", "editId": 573 },
+      { "day": "Saturday", "active": true, "open": "09:00 PM", "close": "11:00 PM", "editId": 574 },
+      { "day": "Sunday", "active": false, "open": "09:00 PM", "close": "11:00 PM", "editId": 568 }
+    ]
+  }
+]

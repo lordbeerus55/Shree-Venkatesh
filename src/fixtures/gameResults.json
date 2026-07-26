@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "gameName": "Raja rani morning",
+    "resultDate": "26-07-2026",
+    "openPana": "789",
+    "openDigit": "4",
+    "closePana": "399",
+    "closeDigit": "1"
+  },
+  {
+    "id": 2,
+    "gameName": "SRIDEVI",
+    "resultDate": "26-07-2026",
+    "openPana": "689",
+    "openDigit": "3",
+    "closePana": "157",
+    "closeDigit": "3"
+  },
+  {
+    "id": 3,
+    "gameName": "MAHARANI",
+    "resultDate": "26-07-2026",
+    "openPana": "140",
+    "openDigit": "5",
+    "closePana": "277",
+    "closeDigit": "6"
+  },
+  {
+    "id": 4,
+    "gameName": "Star morning",
+    "resultDate": "26-07-2026",
+    "openPana": "346",
+    "openDigit": "3",
+    "closePana": "690",
+    "closeDigit": "5"
+  },
+  {
+    "id": 5,
+    "gameName": "MADHUR DAY",
+    "resultDate": "26-07-2026",
+    "openPana": "670",
+    "openDigit": "3",
+    "closePana": "289",
+    "closeDigit": "9"
+  },
+  {
+    "id": 6,
+    "gameName": "Raja rani day",
+    "resultDate": "26-07-2026",
+    "openPana": "370",
+    "openDigit": "0",
+    "closePana": "249",
+    "closeDigit": "5"
+  },
+  {
+    "id": 7,
+    "gameName": "Star day",
+    "resultDate": "26-07-2026",
+    "openPana": "155",
+    "openDigit": "1",
+    "closePana": "236",
+    "closeDigit": "1"
+  },
+  {
+    "id": 8,
+    "gameName": "SUPREME DAY",
+    "resultDate": "26-07-2026",
+    "openPana": "146",
+    "openDigit": "1",
+    "closePana": "",
+    "closeDigit": ""
+  }
+]

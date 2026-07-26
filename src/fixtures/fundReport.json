@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "mobile": "9664963428",
+    "remark": "Deposit from Admin",
+    "beforeWallet": 0,
+    "amount": 300,
+    "afterWallet": 300,
+    "type": "credit",
+    "date": "07/26/2026, 07:00:17 AM"
+  },
+  {
+    "id": 2,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY open : SINGLE PANA : 347 )",
+    "beforeWallet": 5,
+    "amount": 5,
+    "afterWallet": 0,
+    "type": "debit",
+    "date": "07/26/2026, 06:32:49 AM"
+  },
+  {
+    "id": 3,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY open : SINGLE PANA : 248 )",
+    "beforeWallet": 10,
+    "amount": 5,
+    "afterWallet": 5,
+    "type": "debit",
+    "date": "07/26/2026, 06:32:49 AM"
+  },
+  {
+    "id": 4,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY open : SINGLE PANA : 356 )",
+    "beforeWallet": 15,
+    "amount": 5,
+    "afterWallet": 10,
+    "type": "debit",
+    "date": "07/26/2026, 06:32:49 AM"
+  },
+  {
+    "id": 5,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY open : SINGLE PANA : 257 )",
+    "beforeWallet": 20,
+    "amount": 5,
+    "afterWallet": 15,
+    "type": "debit",
+    "date": "07/26/2026, 06:32:49 AM"
+  },
+  {
+    "id": 6,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY close : JODI : 79 )",
+    "beforeWallet": 25,
+    "amount": 5,
+    "afterWallet": 20,
+    "type": "debit",
+    "date": "07/26/2026, 06:31:39 AM"
+  },
+  {
+    "id": 7,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY close : JODI : 78 )",
+    "beforeWallet": 30,
+    "amount": 5,
+    "afterWallet": 25,
+    "type": "debit",
+    "date": "07/26/2026, 06:31:39 AM"
+  },
+  {
+    "id": 8,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY close : JODI : 72 )",
+    "beforeWallet": 35,
+    "amount": 5,
+    "afterWallet": 30,
+    "type": "debit",
+    "date": "07/26/2026, 06:31:39 AM"
+  },
+  {
+    "id": 9,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY close : JODI : 71 )",
+    "beforeWallet": 40,
+    "amount": 5,
+    "afterWallet": 35,
+    "type": "debit",
+    "date": "07/26/2026, 06:31:39 AM"
+  },
+  {
+    "id": 10,
+    "mobile": "9664963428",
+    "remark": "Bid ( MAHARANI DAY close : JODI : 70 )",
+    "beforeWallet": 45,
+    "amount": 5,
+    "afterWallet": 40,
+    "type": "debit",
+    "date": "07/26/2026, 06:31:39 AM"
+  }
+]
