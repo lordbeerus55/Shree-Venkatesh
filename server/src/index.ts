@@ -24,22 +24,37 @@ import timingRoutes from './routes/timings'
 const app = express()
 const PORT = process.env.PORT || 5000
 
-// CORS configuration - allow all origins
+// Simple CORS middleware - must be first
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  res.setHeader('Access-Control-Max-Age', '86400')
+  
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200)
+    res.sendStatus(204)
+    return
   }
+  
   next()
 })
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use('/uploads', express.static(path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads')))
 
-app.use('/api/auth', authRoutes)
+// Add CORS to auth routes
+app.use('/api/auth', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204)
+    return
+  }
+  next()
+}, authRoutes)
 
 app.use('/api/users', requireAuth, userRoutes)
 app.use('/api/markets', requireAuth, marketRoutes)
@@ -63,8 +78,9 @@ app.get('/api/health', (_req, res) => {
 })
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error(err)
-  res.status(500).json({ error: 'Internal server error' })
+  console.error('Error:', err.message)
+  console.error(err.stack)
+  res.status(500).json({ error: err.message || 'Internal server error' })
 })
 
 app.listen(PORT, () => {
