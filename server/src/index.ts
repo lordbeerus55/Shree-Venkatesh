@@ -57,7 +57,10 @@ app.use('/api/contents', requireAuth, contentRoutes)
 app.use('/api/payments', requireAuth, paymentRoutes)
 app.use('/api/timings', requireAuth, timingRoutes)
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok' }))
+app.get('/api/health', (_req, res) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.json({ status: 'ok', cors: 'enabled' })
+})
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err)
