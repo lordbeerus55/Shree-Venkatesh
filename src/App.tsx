@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Login from './pages/Login'
+// Trigger Vercel redeploy
 import Dashboard from './pages/Dashboard'
 import AllUsers from './pages/AllUsers'
 import UserDetails from './pages/UserDetails'
