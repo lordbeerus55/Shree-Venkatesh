@@ -4,44 +4,44 @@ Use this checklist to ensure you've completed all deployment steps.
 
 ## Pre-Deployment
 
-- [ ] Create GitHub repository and push code
-- [ ] Create Vercel account
-- [ ] Create Railway account
-- [ ] Generate JWT secret: `openssl rand -base64 32`
+- [x] Create GitHub repository and push code
+- [x] Create Vercel account
+- [x] Create Railway account
+- [x] Generate JWT secret: `openssl rand -base64 32`
 
 ## Backend Deployment (Railway)
 
-- [ ] Create Railway project from GitHub repo
-- [ ] Add PostgreSQL database service
-- [ ] Copy DATABASE_URL from PostgreSQL service
-- [ ] Set environment variables in Railway backend:
-  - [ ] DATABASE_URL
-  - [ ] JWT_SECRET
-  - [ ] PORT=5000
-  - [ ] NODE_ENV=production
-  - [ ] UPLOAD_DIR=uploads
-  - [ ] FRONTEND_URL (your Vercel frontend URL)
-- [ ] Deploy backend service
+- [x] Create Railway project from GitHub repo
+- [x] Add PostgreSQL database service
+- [x] Copy DATABASE_URL from PostgreSQL service
+- [x] Set environment variables in Railway backend:
+  - [x] DATABASE_URL
+  - [x] JWT_SECRET
+  - [x] PORT=5000
+  - [x] NODE_ENV=production
+  - [x] UPLOAD_DIR=uploads
+  - [x] FRONTEND_URL (your Vercel frontend URL)
+- [x] Deploy backend service
 - [ ] Run database migrations: `npm run db:migrate`
 - [ ] Seed database: `npm run db:seed`
-- [ ] Copy backend URL (e.g., https://xxx.up.railway.app)
+- [x] Copy backend URL (e.g., https://xxx.up.railway.app)
 
 ## Frontend Deployment (Vercel)
 
-- [ ] Create Vercel project from GitHub repo
-- [ ] Set environment variable: VITE_API_URL (use Railway backend URL)
-- [ ] Deploy frontend
-- [ ] Copy frontend URL (e.g., https://xxx.vercel.app)
+- [x] Create Vercel project from GitHub repo
+- [x] Set environment variable: VITE_API_URL (use Railway backend URL)
+- [x] Deploy frontend
+- [x] Copy frontend URL (e.g., https://xxx.vercel.app)
 
 ## Post-Deployment CORS Configuration
 
-- [ ] Update Railway FRONTEND_URL environment variable with Vercel URL
-- [ ] Redeploy Railway backend to apply CORS changes
-- [ ] Verify both services are running
+- [x] Update Railway FRONTEND_URL environment variable with Vercel URL
+- [] Redeploy Railway backend to apply CORS changes
+- [] Verify both services are running
 
 ## Post-Deployment
 
-- [ ] Test frontend loads correctly
+- [x] Test frontend loads correctly
 - [ ] Test login with default credentials (admin/admin@123)
 - [ ] Change default admin password
 - [ ] Test API connectivity
