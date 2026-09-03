@@ -68,7 +68,9 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 })
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
+  console.log(`Server running on port ${PORT}`)
+  console.log(`Environment: ${process.env.NODE_ENV}`)
+  console.log(`Database: ${process.env.DATABASE_URL ? 'configured' : 'NOT configured'}`)
 })
 
 export default app
