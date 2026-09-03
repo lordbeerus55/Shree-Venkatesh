@@ -24,14 +24,12 @@ import timingRoutes from './routes/timings'
 const app = express()
 const PORT = process.env.PORT || 5000
 
-// CORS configuration - allow all origins for now
+// CORS configuration - allow all origins
 app.use(cors({
   origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  allowedHeaders: ['Content-Type', 'Authorization']
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
