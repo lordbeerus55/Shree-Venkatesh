@@ -30,7 +30,12 @@ Shree-Venkatesh/
 
 1. In Railway, click "New Service" → "Database" → "PostgreSQL"
 2. Railway will create a PostgreSQL database
-3. Copy the DATABASE_URL from the database service
+3. Note the service name (default is "Postgres")
+4. In your backend service, set `DATABASE_URL` to use Railway's automatic connection:
+   ```
+   DATABASE_URL=${{ Postgres.DATABASE_PRIVATE_URL }}
+   ```
+   (Replace "Postgres" with your actual database service name if different)
 
 ### 1.3 Set Environment Variables
 
