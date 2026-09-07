@@ -2,16 +2,21 @@ import { useParams, useNavigate } from 'react-router-dom'
 import Table from '../components/Table'
 import Pagination from '../components/Pagination'
 import { useState, useEffect } from 'react'
-import { usersApi } from '../lib/api'
+import { ApiBid, ApiDeposit, ApiWithdrawal, bidsApi, depositsApi, usersApi, walletApi, withdrawalsApi } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 
-interface User { id: number; mobile: string; name: string; walletBalance: number; createdAt: string; isBanned: boolean }
+interface User { id: number; mobile: string; name: string; username?: string; walletBalance: number; createdAt: string; isBanned: boolean }
+interface WalletRecord { id: number; amount: number; type: string; remark?: string; beforeWallet?: number; afterWallet?: number; createdAt?: string; date?: string }
 
 export default function UserDetails() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { canWrite } = useAuth()
   const [user, setUser] = useState<User | null>(null)
+  const [bids, setBids] = useState<ApiBid[]>([])
+  const [transactions, setTransactions] = useState<WalletRecord[]>([])
+  const [withdrawals, setWithdrawals] = useState<ApiWithdrawal[]>([])
+  const [deposits, setDeposits] = useState<ApiDeposit[]>([])
   const [loading, setLoading] = useState(true)
 
   const [pageSize, setPageSize] = useState(10)
@@ -21,7 +26,21 @@ export default function UserDetails() {
   const [pointsAmount, setPointsAmount] = useState('')
 
   useEffect(() => {
-    if (id) usersApi.get(Number(id)).then((u) => setUser(u as User)).catch(console.error).finally(() => setLoading(false))
+    if (!id) return
+    const userId = Number(id)
+    Promise.all([
+      usersApi.get(userId),
+      bidsApi.list({ userId, limit: 100 }),
+      walletApi.userHistory(userId),
+      depositsApi.list({ limit: 100 }),
+      withdrawalsApi.list({ limit: 100 }),
+    ]).then(([userResponse, bidResponse, walletResponse, depositResponse, withdrawalResponse]) => {
+      setUser(userResponse as User)
+      setBids(bidResponse.bids)
+      setTransactions(walletResponse as WalletRecord[])
+      setDeposits(depositResponse.requests.filter((request) => request.user?.id === userId))
+      setWithdrawals(withdrawalResponse.requests.filter((request) => request.user?.id === userId))
+    }).catch(console.error).finally(() => setLoading(false))
   }, [id])
 
   if (loading) return <div className="p-6 text-gray-500">Loading…</div>
@@ -75,17 +94,37 @@ export default function UserDetails() {
     { key: 'date' as keyof any, header: 'Date' },
   ]
 
-  const withdrawData: any[] = []
-  const bidData: any[] = []
-  const transactionData: any[] = []
+  const withdrawData: any[] = withdrawals.map((request) => ({
+    ...request,
+    mobile: user.mobile,
+    name: user.name,
+    createdAt: request.createdAt ? new Date(request.createdAt).toLocaleString() : '',
+  }))
+  const bidData: any[] = bids.map((bid) => ({
+    ...bid,
+    mobile: user.mobile,
+    name: user.name,
+    market: bid.market?.name || '',
+    digits: bid.number,
+    gameName: bid.gameType,
+    placedOn: bid.createdAt ? new Date(bid.createdAt).toLocaleString() : bid.bidDate,
+  }))
+  const transactionData: any[] = transactions.map((transaction) => ({
+    ...transaction,
+    mobile: user.mobile,
+    name: user.name,
+    date: transaction.createdAt ? new Date(transaction.createdAt).toLocaleString() : transaction.date || '',
+  }))
 
+  const totalDeposit = deposits.filter((request) => request.status?.toLowerCase() === 'approved').reduce((sum, request) => sum + Number(request.amount), 0)
+  const totalWithdraw = withdrawals.filter((request) => request.status?.toLowerCase() === 'approved').reduce((sum, request) => sum + Number(request.amount), 0)
   const totalPages = pageSize === -1 ? 1 : Math.ceil(bidData.length / pageSize)
   const displayedBidData = pageSize === -1 ? bidData : bidData.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   return (
     <div className="space-y-6">
       <button
-        onClick={() => navigate('/all-users')}
+        onClick={() => navigate('/users')}
         className="px-3 py-1 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition"
       >
         <i className="fas fa-arrow-left mr-1"></i> Back
@@ -109,8 +148,7 @@ export default function UserDetails() {
           <table className="w-full text-sm border-collapse">
             <tbody>
               <tr className="border-b border-gray-200"><th className="px-4 py-2 text-left bg-gray-50">Full Name</th><td className="px-4 py-2">{user.name}</td></tr>
-              <tr className="border-b border-gray-200"><th className="px-4 py-2 text-left bg-gray-50">Email</th><td className="px-4 py-2"></td></tr>
-              <tr className="border-b border-gray-200"><th className="px-4 py-2 text-left bg-gray-50">Password</th><td className="px-4 py-2">123456</td></tr>
+              {user.username && <tr className="border-b border-gray-200"><th className="px-4 py-2 text-left bg-gray-50">Username</th><td className="px-4 py-2">{user.username}</td></tr>}
               <tr className="border-b border-gray-200"><th className="px-4 py-2 text-left bg-gray-50">Mobile Number</th><td className="px-4 py-2">{user.mobile}</td></tr>
               <tr className="border-b border-gray-200"><th className="px-4 py-2 text-left bg-gray-50">Registration Date</th><td className="px-4 py-2">{new Date(user.createdAt).toLocaleDateString()}</td></tr>
               <tr><th className="px-4 py-2 text-left bg-gray-50">User Status</th><td className="px-4 py-2 text-center">{!user.isBanned ? <span className="px-2 py-1 text-xs text-white bg-green-600 rounded">Active</span> : <span className="px-2 py-1 text-xs text-white bg-red-600 rounded">Banned</span>}</td></tr>
@@ -151,8 +189,8 @@ export default function UserDetails() {
             </div>
             <table className="w-full text-sm border-collapse">
               <tbody>
-                <tr className="border-b border-gray-200"><th className="px-4 py-2 text-left bg-gray-50">Total Deposit</th><td className="px-4 py-2">1500</td></tr>
-                <tr><th className="px-4 py-2 text-left bg-gray-50">Total Withdraw</th><td className="px-4 py-2">0</td></tr>
+                <tr className="border-b border-gray-200"><th className="px-4 py-2 text-left bg-gray-50">Total Approved Deposit</th><td className="px-4 py-2">{totalDeposit}</td></tr>
+                <tr><th className="px-4 py-2 text-left bg-gray-50">Total Approved Withdraw</th><td className="px-4 py-2">{totalWithdraw}</td></tr>
               </tbody>
             </table>
           </div>

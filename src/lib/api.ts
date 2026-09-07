@@ -31,7 +31,7 @@ async function request<T>(
 ): Promise<T> {
   const token = getToken()
   const method = (options.method || 'GET').toUpperCase()
-  if (getAccount()?.role === 'VIEWER' && !['GET', 'HEAD'].includes(method) && path !== '/auth/change-password') {
+  if (getAccount()?.role === 'VIEWER' && !['GET', 'HEAD'].includes(method) && !['/auth/change-password', '/alerts/seen'].includes(path)) {
     throw new Error('This account has read-only access')
   }
   const isFormData = options.body instanceof FormData
@@ -111,6 +111,7 @@ export interface ApiUser {
   id: number
   mobile: string
   name: string
+  username?: string
   walletBalance: number
   isActive: boolean
   isBanned: boolean
@@ -128,7 +129,7 @@ export const usersApi = {
 
   get: (id: number) => request<ApiUser>(`/users/${id}`),
 
-  create: (data: { name: string; mobile: string; mpin: string }) =>
+  create: (data: { name: string; mobile: string; mpin: string; username: string; password: string }) =>
     request<ApiUser>('/users', { method: 'POST', body: JSON.stringify(data) }),
 
   update: (id: number, data: Partial<ApiUser>) =>
@@ -326,6 +327,20 @@ export interface ApiNotification {
   title: string
   body: string
   createdAt: string
+}
+
+export interface ApiAdminAlert {
+  id: number
+  type: string
+  title: string
+  body: string
+  createdAt: string
+  user: { id: number; name: string; mobile: string; username: string | null } | null
+}
+
+export const alertsApi = {
+  list: (page = 1, limit = 20) => request<{ alerts: ApiAdminAlert[]; total: number; unreadCount: number; page: number; limit: number }>(`/alerts?page=${page}&limit=${limit}`),
+  markSeen: () => request<{ message: string }>('/alerts/seen', { method: 'POST' }),
 }
 
 export const notificationsApi = {

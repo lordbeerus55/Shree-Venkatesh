@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
@@ -40,8 +40,9 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">Username</label>
+            <label htmlFor="dashboard-username" className="block text-base font-medium text-gray-700 mb-1">Username</label>
             <input
+              id="dashboard-username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -52,8 +53,9 @@ export default function Login() {
             />
           </div>
           <div>
-            <label className="block text-base font-medium text-gray-700 mb-1">Password</label>
+            <label htmlFor="dashboard-password" className="block text-base font-medium text-gray-700 mb-1">Password</label>
             <input
+              id="dashboard-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -70,6 +72,9 @@ export default function Login() {
             {loading ? 'Logging in…' : 'Login'}
           </button>
         </form>
+        <Link to="/play/login" className="mt-5 block text-center text-sm font-medium text-blue-700 hover:underline">
+          Game Login
+        </Link>
       </div>
       <div className="flex-1 bg-gray-100 flex items-center justify-center p-8">
         <img 

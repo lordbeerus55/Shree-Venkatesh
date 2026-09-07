@@ -32,6 +32,7 @@ import ManageSettings from './pages/ManageSettings'
 import ManagePayment from './pages/ManagePayment'
 import ImageSlider from './pages/ImageSlider'
 import BellNotifications from './pages/BellNotifications'
+import AdminAlerts from './pages/AdminAlerts'
 import SendNotifications from './pages/SendNotifications'
 import ManageContents from './pages/ManageContents'
 import GameManagement from './pages/GameManagement'
@@ -43,6 +44,17 @@ import NoticeManagement from './pages/NoticeManagement'
 import MainStarline from './pages/personal-games/MainStarline'
 import MainJackpot from './pages/personal-games/MainJackpot'
 import Layout from './components/Layout'
+import CustomerLayout from './components/CustomerLayout'
+import { CustomerAuthProvider, useCustomerAuth } from './contexts/CustomerAuthContext'
+import {
+  CustomerBids,
+  CustomerHome,
+  CustomerLogin,
+  CustomerRegister,
+  CustomerMarketPage,
+  CustomerResults,
+  CustomerWallet,
+} from './pages/CustomerPages'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { admin, loading } = useAuth()
@@ -51,12 +63,35 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function CustomerProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { customer, token } = useCustomerAuth()
+  if (!customer || !token) return <Navigate to="/play/login" replace />
+  return <>{children}</>
+}
+
 function App() {
   return (
     <AuthProvider>
+      <CustomerAuthProvider>
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/play/login" element={<CustomerLogin />} />
+        <Route path="/play/register" element={<CustomerRegister />} />
+        <Route path="/play/*" element={
+          <CustomerProtectedRoute>
+            <CustomerLayout>
+              <Routes>
+                <Route path="/" element={<CustomerHome />} />
+                <Route path="/market/:id" element={<CustomerMarketPage />} />
+                <Route path="/bids" element={<CustomerBids />} />
+                <Route path="/results" element={<CustomerResults />} />
+                <Route path="/wallet" element={<CustomerWallet />} />
+                <Route path="*" element={<Navigate to="/play" replace />} />
+              </Routes>
+            </CustomerLayout>
+          </CustomerProtectedRoute>
+        } />
         <Route path="/*" element={
           <ProtectedRoute>
             <Layout>
@@ -90,6 +125,7 @@ function App() {
           <Route path="/manage-settings" element={<ManageSettings />} />
           <Route path="/manage-payment" element={<ManagePayment />} />
           <Route path="/image-slider" element={<ImageSlider />} />
+          <Route path="/alerts" element={<AdminAlerts />} />
           <Route path="/bell_notifications" element={<BellNotifications />} />
           <Route path="/send_notifications" element={<SendNotifications />} />
           <Route path="/content" element={<ManageContents />} />
@@ -99,14 +135,15 @@ function App() {
           <Route path="/wallet-management" element={<WalletManagement />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/notice-management" element={<NoticeManagement />} />
-          <Route path="/personal-games/main-starline" element={<MainStarline />} />
-          <Route path="/personal-games/main-jackpot" element={<MainJackpot />} />
+          <Route path="/personal-games/main-starline/*" element={<MainStarline />} />
+          <Route path="/personal-games/main-jackpot/*" element={<MainJackpot />} />
               </Routes>
             </Layout>
           </ProtectedRoute>
         } />
       </Routes>
     </Router>
+      </CustomerAuthProvider>
     </AuthProvider>
   )
 }

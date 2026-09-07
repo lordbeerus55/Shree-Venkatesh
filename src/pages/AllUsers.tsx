@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { FormEvent, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Table from '../components/Table'
 import Pagination from '../components/Pagination'
@@ -20,7 +20,9 @@ export default function AllUsers() {
   const [amount, setAmount] = useState('')
   const [transactionType, setTransactionType] = useState('credit')
   const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [newUser, setNewUser] = useState({ name: '', mobile: '', mpin: '' })
+  const [newUser, setNewUser] = useState({ name: '', mobile: '', mpin: '', username: '', password: '' })
+  const [createError, setCreateError] = useState('')
+  const [creating, setCreating] = useState(false)
   const loadUsers = (page = 1) => {
     setLoading(true)
     usersApi.list({ page, limit: pageSize === -1 ? 1000 : pageSize })
@@ -94,13 +96,42 @@ export default function AllUsers() {
     setCurrentPage(1)
   }
 
+  const handleCreateUser = async (event: FormEvent) => {
+    event.preventDefault()
+    setCreateError('')
+    const data = {
+      name: newUser.name.trim(),
+      mobile: newUser.mobile.trim(),
+      mpin: newUser.mpin.trim(),
+      username: newUser.username.trim(),
+      password: newUser.password,
+    }
+    if (!data.name) return setCreateError('Name is required.')
+    if (!/^\d{10}$/.test(data.mobile)) return setCreateError('Mobile must contain exactly 10 digits.')
+    if (!/^\d{4}$/.test(data.mpin)) return setCreateError('MPIN must contain exactly 4 digits.')
+    if (data.username.length < 3 || data.username.length > 50) return setCreateError('Username must be 3 to 50 characters.')
+    if (data.password.length < 12) return setCreateError('Password must be at least 12 characters.')
+    setCreating(true)
+    try {
+      await usersApi.create(data)
+      setCreateModalOpen(false)
+      setCurrentPage(1)
+      loadUsers(1)
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : 'Could not create customer.')
+    } finally {
+      setCreating(false)
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Customer Users</h2>
         {canWrite && <button
           onClick={() => {
-            setNewUser({ name: '', mobile: '', mpin: '' })
+            setNewUser({ name: '', mobile: '', mpin: '', username: '', password: '' })
+            setCreateError('')
             setCreateModalOpen(true)
           }}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition"
@@ -140,54 +171,34 @@ export default function AllUsers() {
               </button>
             </div>
 
-            <div className="p-4 space-y-4">
+            <form onSubmit={handleCreateUser} className="p-4 space-y-4 max-h-[75vh] overflow-y-auto">
+              {createError && <div className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">{createError}</div>}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input
-                  type="text"
-                  value={newUser.name}
-                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
+                <label htmlFor="customer-name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input id="customer-name" type="text" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
-                <input
-                  type="number"
-                  maxLength={10}
-                  value={newUser.mobile}
-                  onChange={(e) => setNewUser({ ...newUser, mobile: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
+                <label htmlFor="customer-mobile" className="block text-sm font-medium text-gray-700 mb-1">Mobile (10 digits)</label>
+                <input id="customer-mobile" type="tel" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} value={newUser.mobile} onChange={(e) => setNewUser({ ...newUser, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">MPIN (4-digit)</label>
-                <input
-                  type="text"
-                  value={newUser.mpin}
-                  onChange={(e) => setNewUser({ ...newUser, mpin: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
+                <label htmlFor="customer-mpin" className="block text-sm font-medium text-gray-700 mb-1">MPIN (4 digits)</label>
+                <input id="customer-mpin" type="password" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} value={newUser.mpin} onChange={(e) => setNewUser({ ...newUser, mpin: e.target.value.replace(/\D/g, '').slice(0, 4) })} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
               </div>
-
+              <div>
+                <label htmlFor="customer-username" className="block text-sm font-medium text-gray-700 mb-1">Username (3–50 characters)</label>
+                <input id="customer-username" type="text" minLength={3} maxLength={50} autoComplete="off" value={newUser.username} onChange={(e) => setNewUser({ ...newUser, username: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              </div>
+              <div>
+                <label htmlFor="customer-password" className="block text-sm font-medium text-gray-700 mb-1">Password (at least 12 characters)</label>
+                <input id="customer-password" type="password" minLength={12} autoComplete="new-password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+              </div>
               <div className="flex justify-end pt-2">
-                <button
-                  onClick={() => {
-                    usersApi.create({ name: newUser.name, mobile: newUser.mobile, mpin: newUser.mpin })
-                      .then(() => { setCreateModalOpen(false); loadUsers(1) })
-                      .catch((err) => alert(err.message))
-                  }}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition"
-                >
-                  Create Customer
+                <button type="submit" disabled={creating} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">
+                  {creating ? 'Creating…' : 'Create Customer'}
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}

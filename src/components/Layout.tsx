@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import AdminAlertBell from './AdminAlertBell'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -72,6 +73,17 @@ export default function Layout({ children }: LayoutProps) {
               >
                 <i className="fas fa-users mr-3"></i>
                 <span>Customer Users</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/alerts"
+                className={`flex items-center px-4 py-2 text-sm rounded-md ${
+                  isActive('/alerts') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <i className="fas fa-bell mr-3"></i>
+                <span>Notifications</span>
               </Link>
             </li>
             {canWrite && (
@@ -473,9 +485,12 @@ export default function Layout({ children }: LayoutProps) {
               Read-only access: you can view data, but cannot make changes.
             </div>
           ) : <div />}
-          <button onClick={handleLogout} className="px-3 py-1.5 text-sm text-white bg-red-600 rounded hover:bg-red-700 transition">
-            <i className="fas fa-sign-out-alt mr-1"></i> Logout
-          </button>
+          <div className="flex items-center gap-4">
+            <AdminAlertBell />
+            <button onClick={handleLogout} className="px-3 py-1.5 text-sm text-white bg-red-600 rounded hover:bg-red-700 transition">
+              <i className="fas fa-sign-out-alt mr-1"></i> Logout
+            </button>
+          </div>
         </header>
         <div className="p-6">{children}</div>
       </main>
