@@ -3,12 +3,14 @@ import Table from '../components/Table'
 import Pagination from '../components/Pagination'
 import { useState, useEffect } from 'react'
 import { usersApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
-interface User { id: number; mobile: string; name: string; mpin: string; walletBalance: number; createdAt: string; isBanned: boolean }
+interface User { id: number; mobile: string; name: string; walletBalance: number; createdAt: string; isBanned: boolean }
 
 export default function UserDetails() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { canWrite } = useAuth()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -121,11 +123,11 @@ export default function UserDetails() {
               <span>{user.walletBalance}₹</span>
               <b className="text-green-600 text-sm ml-1">Points</b>
             </h3>
-            <div className="flex justify-center gap-2 mt-3">
+            {canWrite && <div className="flex justify-center gap-2 mt-3">
               <button onClick={() => { setPointsAmount(''); setAddModalOpen(true) }} className="px-3 py-1 text-xs text-white bg-green-600 rounded hover:bg-green-700 transition">Add Points</button>
               <button onClick={() => { setPointsAmount(''); setWithdrawModalOpen(true) }} className="px-3 py-1 text-xs text-white bg-red-600 rounded hover:bg-red-700 transition">Withdraw Points</button>
               
-            </div>
+            </div>}
           </div>
         </div>
 
@@ -202,7 +204,7 @@ export default function UserDetails() {
         </div>
       </div>
 
-      {addModalOpen && (
+      {canWrite && addModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -235,7 +237,7 @@ export default function UserDetails() {
         </div>
       )}
 
-      {withdrawModalOpen && (
+      {canWrite && withdrawModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">

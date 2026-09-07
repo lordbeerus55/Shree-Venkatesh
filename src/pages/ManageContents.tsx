@@ -1,9 +1,11 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { contentsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 type ContentKey = 'videos' | 'withdraw_rules' | 'game_rules'
 
 export default function ManageContents() {
+  const { canWrite } = useAuth()
   const [activeTab, setActiveTab] = useState<ContentKey>('videos')
   const [content, setContent] = useState<Record<ContentKey, string>>({ videos: '', withdraw_rules: '', game_rules: '' })
   const [msg, setMsg] = useState('')
@@ -62,11 +64,12 @@ export default function ManageContents() {
               <textarea
                 value={content[activeTab]}
                 onChange={(e) => setContent({ ...content, [activeTab]: e.target.value })}
+                disabled={!canWrite}
                 rows={8}
                 className="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono"
               />
             </div>
-            <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">
+            <button type="submit" disabled={loading || !canWrite} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">
               {loading ? 'Saving…' : 'Update'}
             </button>
           </form>

@@ -1,55 +1,40 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { authApi } from '../lib/api'
-
-interface AuthAdmin {
-  id: number
-  username: string
-}
+import { createContext, useContext, useState, ReactNode } from 'react'
+import { authApi, AuthAccount, setAuthSession } from '../lib/api'
 
 interface AuthContextValue {
-  admin: AuthAdmin | null
+  admin: AuthAccount | null
   token: string | null
   login: (username: string, password: string) => Promise<void>
   logout: () => void
   loading: boolean
+  canWrite: boolean
+  isReadOnly: boolean
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [admin, setAdmin] = useState<AuthAdmin | null>(null)
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('admin_token'))
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (token) {
-      authApi.me()
-        .then((me) => setAdmin({ id: me.id, username: me.username }))
-        .catch(() => {
-          localStorage.removeItem('admin_token')
-          setToken(null)
-        })
-        .finally(() => setLoading(false))
-    } else {
-      setLoading(false)
-    }
-  }, [token])
+  const [admin, setAdmin] = useState<AuthAccount | null>(null)
+  const [token, setToken] = useState<string | null>(null)
 
   const login = async (username: string, password: string) => {
     const res = await authApi.login(username, password)
-    localStorage.setItem('admin_token', res.token)
+    setAuthSession(res.token, res.admin)
     setToken(res.token)
     setAdmin(res.admin)
   }
 
   const logout = () => {
-    localStorage.removeItem('admin_token')
+    setAuthSession(null, null)
     setToken(null)
     setAdmin(null)
   }
 
+  const canWrite = admin?.role === 'ADMIN'
+  const isReadOnly = admin?.role === 'VIEWER'
+
   return (
-    <AuthContext.Provider value={{ admin, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ admin, token, login, logout, loading: false, canWrite, isReadOnly }}>
       {children}
     </AuthContext.Provider>
   )

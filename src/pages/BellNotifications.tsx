@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import Pagination from '../components/Pagination'
 import { notificationsApi, ApiNotification } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 type Notification = ApiNotification
 
 export default function BellNotifications() {
+  const { canWrite } = useAuth()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [search, setSearch] = useState('')
   const [pageSize, setPageSize] = useState(10)
@@ -43,12 +45,12 @@ export default function BellNotifications() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h3 className="text-lg font-semibold text-gray-800">Bell Notifications</h3>
-          <button
+          {canWrite && <button
             onClick={() => setModalOpen(true)}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition"
           >
             Add Notification
-          </button>
+          </button>}
         </div>
 
         <div className="p-4 overflow-x-auto">
@@ -101,7 +103,7 @@ export default function BellNotifications() {
                     <td className="px-4 py-2 border border-gray-300">{n.body}</td>
                     <td className="px-4 py-2 border border-gray-300">{new Date(n.createdAt).toLocaleString()}</td>
                     <td className="px-4 py-2 border border-gray-300">
-                      <button onClick={() => handleDelete(n.id)} className="px-2 py-1 text-xs text-white bg-red-600 rounded">Delete</button>
+                      {canWrite && <button onClick={() => handleDelete(n.id)} className="px-2 py-1 text-xs text-white bg-red-600 rounded">Delete</button>}
                     </td>
                   </tr>
                 ))
@@ -119,7 +121,7 @@ export default function BellNotifications() {
         </div>
       </div>
 
-      {modalOpen && (
+      {canWrite && modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">

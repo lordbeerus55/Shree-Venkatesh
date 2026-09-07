@@ -42,8 +42,8 @@ Use this checklist to ensure you've completed all deployment steps.
 ## Post-Deployment
 
 - [x] Test frontend loads correctly
-- [ ] Test login with default credentials (admin/admin@123)
-- [ ] Change default admin password
+- [ ] Test login with the configured administrator credentials
+- [ ] Confirm the administrator password is unique and private
 - [ ] Test API connectivity
 - [ ] Verify database operations work
 - [ ] Check Railway logs for errors

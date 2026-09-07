@@ -1,7 +1,11 @@
 import { useState, FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { authApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function ChangePassword() {
+  const { logout } = useAuth()
+  const navigate = useNavigate()
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -16,8 +20,10 @@ export default function ChangePassword() {
     setLoading(true)
     try {
       await authApi.changePassword(oldPassword, newPassword)
-      setMsg('Password changed successfully')
+      setMsg('Password changed successfully. Please sign in again.')
       setOldPassword(''); setNewPassword(''); setConfirmPassword('')
+      logout()
+      navigate('/login')
     } catch (error) {
       setErr(error instanceof Error ? error.message : 'Failed')
     } finally {

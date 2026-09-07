@@ -1,8 +1,10 @@
 import { useMemo, useState, useEffect } from 'react'
 import Pagination from '../components/Pagination'
 import { marketsApi, bidsApi, ApiMarket, ApiBid } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function BidRevert() {
+  const { canWrite } = useAuth()
   const [markets, setMarkets] = useState<ApiMarket[]>([])
   const [bets, setBets] = useState<ApiBid[]>([])
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -117,7 +119,7 @@ export default function BidRevert() {
             </div>
           </div>
 
-          {selected.length > 0 && (
+          {canWrite && selected.length > 0 && (
             <div className="mt-4">
               <button
                 onClick={handleRevertSelected}
@@ -168,6 +170,7 @@ export default function BidRevert() {
                     type="checkbox"
                     checked={displayedBets.length > 0 && selected.length === displayedBets.length}
                     onChange={toggleSelectAll}
+                    disabled={!canWrite}
                   />
                 </th>
                 <th className="px-4 py-2 border border-gray-300">Date</th>
@@ -196,6 +199,7 @@ export default function BidRevert() {
                         type="checkbox"
                         checked={selected.includes(bet.id)}
                         onChange={() => toggleSelect(bet.id)}
+                        disabled={!canWrite}
                       />
                     </td>
                     <td className="px-4 py-2 border border-gray-300">{new Date(bet.bidDate).toLocaleDateString()}</td>

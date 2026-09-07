@@ -124,11 +124,9 @@ After deployment, make sure your frontend is pointing to the correct backend URL
 
 ### 3.3 Test the Application
 
-1. Open your Vercel frontend URL
-2. Login with default credentials:
-   - Username: `admin`
-   - Password: `admin@123`
-3. Change the default password immediately
+1. Open your frontend URL
+2. Sign in with the administrator credentials configured for your deployment
+3. Verify the Dashboard Users page is available to the administrator
 
 ## Step 4: Database Management
 
@@ -196,7 +194,7 @@ Monitor usage in respective dashboards to avoid unexpected charges.
 
 ## Security Recommendations
 
-1. **Change default admin password** immediately after first login
+1. **Use a unique administrator password** and rotate any previously published credential
 2. **Use strong JWT_SECRET** - generate with `openssl rand -base64 32`
 3. **Enable HTTPS** - both Vercel and Railway provide this automatically
 4. **Set up CORS properly** - ensure only your frontend domain can access API

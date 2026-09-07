@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { marketsApi, ApiMarket, resultsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 const formatDate = (date: Date) => date.toISOString().split('T')[0]
 
@@ -16,6 +17,7 @@ const ranges: Record<string, { start: string; end: string }> = {
 }
 
 export default function GenerateResult() {
+  const { canWrite } = useAuth()
   const [apiMarkets, setApiMarkets] = useState<ApiMarket[]>([])
   const [startDate, setStartDate] = useState(formatDate(new Date()))
   const [endDate, setEndDate] = useState(formatDate(new Date()))
@@ -152,7 +154,7 @@ export default function GenerateResult() {
             <div>
               <button
                 onClick={handleGenerate}
-                disabled={submitting}
+                disabled={submitting || !canWrite}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60"
               >
                 {submitting ? 'Generating…' : 'Generate Result'}

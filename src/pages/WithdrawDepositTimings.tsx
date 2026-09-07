@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { timingsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const makeDefault = (start: string, end: string) => Object.fromEntries(days.map((d) => [d, { start, end }]))
 
 export default function WithdrawDepositTimings() {
+  const { canWrite } = useAuth()
   const [activeTab, setActiveTab] = useState<'withdraw' | 'deposit'>('withdraw')
   const [withdraw, setWithdraw] = useState<Record<string, { start: string; end: string }>>(makeDefault('07:00', '23:00'))
   const [deposit, setDeposit] = useState<Record<string, { start: string; end: string }>>(makeDefault('09:00', '17:00'))
@@ -66,6 +68,7 @@ export default function WithdrawDepositTimings() {
             <form onSubmit={(e) => { e.preventDefault(); handleSubmit('withdraw', withdraw) }}
               className="space-y-6"
             >
+              <fieldset disabled={!canWrite} className="space-y-6">
               <input type="hidden" name="type" value="withdraw" />
               {days.map((day) => (
                 <div key={`withdraw-${day}`}>
@@ -98,6 +101,7 @@ export default function WithdrawDepositTimings() {
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">
                 {submitting ? 'Saving…' : 'Submit'}
               </button>
+              </fieldset>
             </form>
           )}
 
@@ -105,6 +109,7 @@ export default function WithdrawDepositTimings() {
             <form onSubmit={(e) => { e.preventDefault(); handleSubmit('deposit', deposit) }}
               className="space-y-6"
             >
+              <fieldset disabled={!canWrite} className="space-y-6">
               <input type="hidden" name="type" value="deposit" />
               {days.map((day) => (
                 <div key={`deposit-${day}`}>
@@ -137,6 +142,7 @@ export default function WithdrawDepositTimings() {
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">
                 {submitting ? 'Saving…' : 'Submit'}
               </button>
+              </fieldset>
             </form>
           )}
         </div>

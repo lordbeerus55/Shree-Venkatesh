@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Pagination from '../components/Pagination'
 import { marketsApi, ApiMarket } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 type Schedule = ApiMarket['schedules'][number]
 type Market = ApiMarket
@@ -30,6 +31,7 @@ function to24Hour(time12: string): string {
 }
 
 export default function Markets() {
+  const { canWrite } = useAuth()
   const [markets, setMarkets] = useState<Market[]>([])
   const [pageSize, setPageSize] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
@@ -96,12 +98,12 @@ export default function Markets() {
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Markets</h2>
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-4 border-b border-gray-200">
-          <button
+          {canWrite && <button
             onClick={() => setAddModalOpen(true)}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition"
           >
             Add Market
-          </button>
+          </button>}
         </div>
 
         <div className="p-4 overflow-x-auto">
@@ -139,7 +141,7 @@ export default function Markets() {
                   <td className="px-4 py-2 border border-gray-300">
                     <div className="flex flex-col">
                       <strong>{market.name}</strong>
-                      <div className="flex gap-2 mt-2">
+                      {canWrite && <div className="flex gap-2 mt-2">
                         <button
                           onClick={() => setMarketModal(market)}
                           className="px-2 py-1 text-xs text-white bg-cyan-600 rounded hover:bg-cyan-700 transition"
@@ -152,7 +154,7 @@ export default function Markets() {
                         >
                           <i className="fas fa-trash mr-1"></i> Delete
                         </button>
-                      </div>
+                      </div>}
                     </div>
                   </td>
                   {days.map((dayName) => {
@@ -168,14 +170,14 @@ export default function Markets() {
                           <div>Open: {s.openTime}</div>
                           <div>Close: {s.closeTime}</div>
                         </div>
-                        <button
+                        {canWrite && <button
                           onClick={() => setDayModal({ marketId: market.id, schedule: s })}
                           className="mt-2 px-2 py-1 text-xs text-white bg-blue-600 rounded hover:bg-blue-700 transition"
                         >
                           <i className="fas fa-edit"></i>
-                        </button>
+                        </button>}
                       </div>
-                      ) : (
+                      ) : canWrite ? (
                         <button
                           onClick={() => setAddScheduleModal({ marketId: market.id, dayOfWeek: dayName })}
                           className="px-2 py-1 text-xs text-white bg-green-600 rounded hover:bg-green-700 transition"
@@ -183,7 +185,7 @@ export default function Markets() {
                         >
                           <i className="fas fa-plus"></i> Add
                         </button>
-                      )}
+                      ) : <span className="text-xs text-gray-400">—</span>}
                     </td>
                     )
                   })}
@@ -196,7 +198,7 @@ export default function Markets() {
         </div>
       </div>
 
-      {dayModal && (
+      {canWrite && dayModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
             <div className="flex items-center justify-between mb-4">
@@ -244,7 +246,7 @@ export default function Markets() {
         </div>
       )}
 
-      {marketModal && (
+      {canWrite && marketModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
             <div className="flex items-center justify-between mb-4">
@@ -298,7 +300,7 @@ export default function Markets() {
         </div>
       )}
 
-      {addScheduleModal && (
+      {canWrite && addScheduleModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
             <div className="flex items-center justify-between mb-4">
@@ -346,7 +348,7 @@ export default function Markets() {
         </div>
       )}
 
-      {deleteModal && (
+      {canWrite && deleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-4">
             <h4 className="text-lg font-semibold text-gray-800 mb-4">Delete {deleteModal.name}?</h4>
@@ -358,7 +360,7 @@ export default function Markets() {
         </div>
       )}
 
-      {addModalOpen && (
+      {canWrite && addModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
             <div className="flex items-center justify-between mb-4">

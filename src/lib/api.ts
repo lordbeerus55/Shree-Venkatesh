@@ -1,7 +1,28 @@
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+export const API_ORIGIN = BASE.replace(/\/api\/?$/, '')
+
+export type AccountRole = 'ADMIN' | 'VIEWER'
+
+export interface AuthAccount {
+  id: number
+  username: string
+  role: AccountRole
+}
+
+let authToken: string | null = null
+let authAccount: AuthAccount | null = null
+
+export function setAuthSession(token: string | null, account: AuthAccount | null): void {
+  authToken = token
+  authAccount = account
+}
 
 function getToken(): string | null {
-  return localStorage.getItem('admin_token')
+  return authToken
+}
+
+function getAccount(): AuthAccount | null {
+  return authAccount
 }
 
 async function request<T>(
@@ -9,10 +30,15 @@ async function request<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const token = getToken()
+  const method = (options.method || 'GET').toUpperCase()
+  if (getAccount()?.role === 'VIEWER' && !['GET', 'HEAD'].includes(method) && path !== '/auth/change-password') {
+    throw new Error('This account has read-only access')
+  }
+  const isFormData = options.body instanceof FormData
   const res = await fetch(`${BASE}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(!isFormData ? { 'Content-Type': 'application/json' } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
@@ -29,18 +55,37 @@ async function request<T>(
 
 export const authApi = {
   login: (username: string, password: string) =>
-    request<{ token: string; admin: { id: number; username: string } }>('/auth/login', {
+    request<{ token: string; admin: AuthAccount }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username, password }),
     }),
 
-  me: () => request<{ id: number; username: string; walletBalance: number }>('/auth/me'),
+  me: () => request<AuthAccount & { walletBalance: number }>('/auth/me'),
 
   changePassword: (currentPassword: string, newPassword: string) =>
     request<{ message: string }>('/auth/change-password', {
       method: 'POST',
       body: JSON.stringify({ currentPassword, newPassword }),
     }),
+}
+
+export interface DashboardAccount extends AuthAccount {
+  createdAt: string
+}
+
+export const accountsApi = {
+  list: () => request<DashboardAccount[]>('/accounts'),
+  createViewer: (username: string, password: string) =>
+    request<DashboardAccount>('/accounts', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    }),
+  resetPassword: (id: number, password: string) =>
+    request<{ message: string }>(`/accounts/${id}/password`, {
+      method: 'PUT',
+      body: JSON.stringify({ password }),
+    }),
+  delete: (id: number) => request<{ message: string }>(`/accounts/${id}`, { method: 'DELETE' }),
 }
 
 // ─── Dashboard ───────────────────────────────────────────────────────────────
@@ -66,7 +111,6 @@ export interface ApiUser {
   id: number
   mobile: string
   name: string
-  mpin: string
   walletBalance: number
   isActive: boolean
   isBanned: boolean
@@ -322,6 +366,7 @@ export const timingsApi = {
 export const paymentsApi = {
   list: () => request<unknown[]>('/payments'),
   create: (data: unknown) => request('/payments', { method: 'POST', body: JSON.stringify(data) }),
+  upload: (formData: FormData) => request<{ qrImageUrl: string }>('/payments', { method: 'POST', body: formData }),
   update: (id: number, data: unknown) => request(`/payments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id: number) => request(`/payments/${id}`, { method: 'DELETE' }),
 }
@@ -330,13 +375,6 @@ export const paymentsApi = {
 
 export const sliderApi = {
   list: () => request<{ id: number; imageUrl: string; redirectUrl: string; sortOrder: number; isActive: boolean }[]>('/slider'),
-  upload: (formData: FormData) => {
-    const token = getToken()
-    return fetch(`${BASE}/slider`, {
-      method: 'POST',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: formData,
-    }).then((r) => r.json())
-  },
+  upload: (formData: FormData) => request('/slider', { method: 'POST', body: formData }),
   delete: (id: number) => request(`/slider/${id}`, { method: 'DELETE' }),
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import Pagination from '../components/Pagination'
 import { withdrawalsApi, ApiWithdrawal } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 const today = new Date().toISOString().split('T')[0]
 
@@ -12,6 +13,7 @@ const statusOptions = [
 ]
 
 export default function WithdrawRequests() {
+  const { canWrite } = useAuth()
   const [requests, setRequests] = useState<ApiWithdrawal[]>([])
   const [startDate, setStartDate] = useState(today)
   const [endDate, setEndDate] = useState(today)
@@ -165,7 +167,7 @@ export default function WithdrawRequests() {
                       <span className="text-xs text-gray-600">{r.accountHolder || r.upiId || '—'}</span>
                     </td>
                     <td className="px-4 py-2 border border-gray-300 space-x-1">
-                      {r.status === 'pending' && <>
+                      {canWrite && r.status === 'pending' && <>
                         <button onClick={() => handleApprove(r.id)} className="px-2 py-1 text-xs text-white bg-green-600 rounded">Approve</button>
                         <button onClick={() => handleReject(r.id)} className="px-2 py-1 text-xs text-white bg-red-600 rounded">Reject</button>
                       </>}

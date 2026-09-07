@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { gameRatesApi, ApiGameRates } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 type GameRatesData = { [K in keyof Omit<ApiGameRates, 'id'>]: string }
 
@@ -13,6 +14,7 @@ const toStrings = (r: ApiGameRates): GameRatesData => ({
 const DEFAULT: GameRatesData = { single:'10', jodi:'100', singlePana:'160', doublePana:'320', triplePana:'1000', sp:'150', dp:'300', tp:'1000', fp:'150', cp:'150', halfSangam:'1200', fullSangam:'12000' }
 
 export default function GameRates() {
+  const { canWrite } = useAuth()
   const [rates, setRates] = useState<GameRatesData>(DEFAULT)
   const [msg, setMsg] = useState('')
   const [loading, setLoading] = useState(false)
@@ -67,6 +69,7 @@ export default function GameRates() {
                   type="text"
                   value={rates[key]}
                   onChange={(e) => handleChange(key, e.target.value)}
+                  disabled={!canWrite}
                   required={key === 'single'}
                   className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded text-sm"
                 />
@@ -75,7 +78,7 @@ export default function GameRates() {
             <div>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !canWrite}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60"
               >
                 {loading ? 'Saving…' : 'Update Rates'}

@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import Pagination from '../components/Pagination'
 import { sliderApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 interface SliderImage { id: number; imageUrl: string; redirectUrl: string; sortOrder: number; isActive: boolean }
 
 export default function ImageSlider() {
+  const { canWrite } = useAuth()
   const [images, setImages] = useState<SliderImage[]>([])
   const [search, setSearch] = useState('')
   const [pageSize, setPageSize] = useState(10)
@@ -51,12 +53,12 @@ export default function ImageSlider() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h3 className="text-lg font-semibold text-gray-800">Image Slider</h3>
-          <button
+          {canWrite && <button
             onClick={() => setModalOpen(true)}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition"
           >
             Add Image
-          </button>
+          </button>}
         </div>
 
         <div className="p-4 overflow-x-auto">
@@ -109,7 +111,7 @@ export default function ImageSlider() {
                     </td>
                     <td className="px-4 py-2 border border-gray-300">{img.redirectUrl || '—'}</td>
                     <td className="px-4 py-2 border border-gray-300">
-                      <button onClick={() => handleDelete(img.id)} className="px-2 py-1 text-xs text-white bg-red-600 rounded">Delete</button>
+                      {canWrite && <button onClick={() => handleDelete(img.id)} className="px-2 py-1 text-xs text-white bg-red-600 rounded">Delete</button>}
                     </td>
                   </tr>
                 ))
@@ -127,7 +129,7 @@ export default function ImageSlider() {
         </div>
       </div>
 
-      {modalOpen && (
+      {canWrite && modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">

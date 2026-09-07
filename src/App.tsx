@@ -4,6 +4,7 @@ import Login from './pages/Login'
 // Trigger Vercel redeploy
 import Dashboard from './pages/Dashboard'
 import AllUsers from './pages/AllUsers'
+import DashboardAccounts from './pages/DashboardAccounts'
 import UserDetails from './pages/UserDetails'
 import SystemReports from './pages/SystemReports'
 import DepositReport from './pages/DepositReport'
@@ -62,6 +63,7 @@ function App() {
               <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/users" element={<AllUsers />} />
+          <Route path="/dashboard-users" element={<DashboardAccounts />} />
           <Route path="/users/:id" element={<UserDetails />} />
           <Route path="/system-reports/market-report" element={<SystemReports />} />
           <Route path="/deposit-report" element={<DepositReport />} />

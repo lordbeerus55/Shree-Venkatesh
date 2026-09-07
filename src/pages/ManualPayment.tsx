@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import Pagination from '../components/Pagination'
-import { paymentsApi } from '../lib/api'
+import { API_ORIGIN, paymentsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 interface PaymentMethod { id: number; qrImageUrl: string | null; upiId: string; isActive: boolean }
 
 export default function ManualPayment() {
+  const { canWrite } = useAuth()
   const [methods, setMethods] = useState<PaymentMethod[]>([])
   const [search, setSearch] = useState('')
   const [pageSize, setPageSize] = useState(10)
@@ -23,11 +25,7 @@ export default function ManualPayment() {
     const formData = new FormData()
     formData.append('qrImage', qrFile)
 
-    await fetch(`${import.meta.env.VITE_API_URL}/payments`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
-      body: formData,
-    }).catch((err) => alert(err.message))
+    await paymentsApi.upload(formData).catch((err) => alert(err.message))
 
     load(); setModalOpen(false); setQrFile(null)
     setSubmitting(false)
@@ -51,12 +49,12 @@ export default function ManualPayment() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h3 className="text-lg font-semibold text-gray-800">Manual Payment Details</h3>
-          <button
+          {canWrite && <button
             onClick={() => setModalOpen(true)}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition"
           >
             Add Details
-          </button>
+          </button>}
         </div>
 
         <div className="p-4 overflow-x-auto">
@@ -106,7 +104,7 @@ export default function ManualPayment() {
                     <td className="px-4 py-2 border border-gray-300 text-center">{m.id}</td>
                     <td className="px-4 py-2 border border-gray-300">
                       {m.qrImageUrl ? (
-                        <img src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${m.qrImageUrl}`} alt="QR" className="h-16 w-16 object-contain" />
+                        <img src={`${API_ORIGIN}${m.qrImageUrl}`} alt="QR" className="h-16 w-16 object-contain" />
                       ) : <span className="text-gray-400">No image</span>}
                     </td>
                     <td className="px-4 py-2 border border-gray-300">
@@ -115,7 +113,7 @@ export default function ManualPayment() {
                       </span>
                     </td>
                     <td className="px-4 py-2 border border-gray-300">
-                      <button onClick={() => handleDelete(m.id)} className="px-2 py-1 text-xs text-white bg-red-600 rounded">Delete</button>
+                      {canWrite && <button onClick={() => handleDelete(m.id)} className="px-2 py-1 text-xs text-white bg-red-600 rounded">Delete</button>}
                     </td>
                   </tr>
                 ))
@@ -133,7 +131,7 @@ export default function ManualPayment() {
         </div>
       </div>
 
-      {modalOpen && (
+      {canWrite && modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Add Payment Method</h3>

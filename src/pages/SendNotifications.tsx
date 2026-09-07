@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { notificationsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function SendNotifications() {
+  const { canWrite } = useAuth()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [topic, setTopic] = useState('all')
@@ -59,7 +61,7 @@ export default function SendNotifications() {
                 <option value="all">All users</option>
               </select>
             </div>
-            <button type="submit" disabled={submitting}
+            <button type="submit" disabled={submitting || !canWrite}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">
               {submitting ? 'Sending…' : 'Send Notification'}
             </button>

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { settingsApi } from '../lib/api'
+import { API_ORIGIN, paymentsApi, settingsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function ManagePayment() {
+  const { canWrite } = useAuth()
   const [submitting, setSubmitting] = useState(false)
   const [msg, setMsg] = useState('')
   const [qrFile, setQrFile] = useState<File | null>(null)
@@ -30,15 +32,8 @@ export default function ManagePayment() {
               if (qrFile) {
                 const formData = new FormData()
                 formData.append('qrImage', qrFile)
-                const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/payments`, {
-                  method: 'POST',
-                  headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
-                  body: formData,
-                }).catch((err) => { alert(err.message); return null })
-                if (uploadRes) {
-                  const uploadData = await uploadRes.json()
-                  finalQrUrl = uploadData.qrImageUrl
-                }
+                const uploadData = await paymentsApi.upload(formData).catch((err) => { alert(err.message); return null })
+                if (uploadData) finalQrUrl = uploadData.qrImageUrl
               }
 
               await settingsApi.update({
@@ -58,18 +53,19 @@ export default function ManagePayment() {
                 type="file"
                 accept="image/*"
                 onChange={(e) => setQrFile(e.target.files?.[0] || null)}
+                disabled={!canWrite}
                 className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
               />
             </div>
 
-            <button type="submit" disabled={submitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">{submitting ? 'Updating…' : 'Update'}</button>
+            <button type="submit" disabled={submitting || !canWrite} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">{submitting ? 'Updating…' : 'Update'}</button>
 
             {(qrImageUrl || qrFile) && (
               <div className="mt-8 pt-8 border-t border-gray-200">
                 <h4 className="text-lg font-semibold text-gray-800 mb-4">QR Code Preview</h4>
                 <div className="flex justify-center">
                   <img 
-                    src={qrFile ? URL.createObjectURL(qrFile) : `${import.meta.env.VITE_API_URL.replace('/api', '')}${qrImageUrl}`} 
+                    src={qrFile ? URL.createObjectURL(qrFile) : `${API_ORIGIN}${qrImageUrl}`}
                     alt="QR Code" 
                     className="max-w-md w-full h-auto border border-gray-300 rounded-lg shadow-md"
                   />

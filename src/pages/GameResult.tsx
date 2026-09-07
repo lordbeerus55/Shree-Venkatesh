@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import panasData from '../fixtures/panas.json'
 import { marketsApi, resultsApi, ApiMarket } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 const panas: string[] = panasData as string[]
 
@@ -19,6 +20,7 @@ interface ResultRow {
 }
 
 export default function GameResult() {
+  const { canWrite } = useAuth()
   const [apiMarkets, setApiMarkets] = useState<ApiMarket[]>([])
   const [results, setResults] = useState<ResultRow[]>([])
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
@@ -112,7 +114,7 @@ export default function GameResult() {
                   className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-100" />
               </div>
             </div>
-            <div>
+            {canWrite && <div>
               {!showActions ? (
                 <button type="button" onClick={() => setShowActions(true)}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition">
@@ -126,7 +128,7 @@ export default function GameResult() {
                   </button>
                 </div>
               )}
-            </div>
+            </div>}
           </form>
         </div>
       </div>

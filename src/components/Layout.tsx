@@ -7,7 +7,7 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const { admin, logout } = useAuth()
+  const { admin, logout, canWrite, isReadOnly } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = () => { logout(); navigate('/login') }
@@ -34,6 +34,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="p-4 border-b border-gray-200">
           <h1 className="text-lg font-bold text-gray-800">Shree Venkatesh</h1>
           {admin && <p className="text-xs text-gray-500 mt-0.5">{admin.username}</p>}
+          {isReadOnly && <span className="inline-block mt-2 px-2 py-1 text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-300 rounded">VIEWER · READ ONLY</span>}
         </div>
 
         {/* Search */}
@@ -70,9 +71,22 @@ export default function Layout({ children }: LayoutProps) {
                 }`}
               >
                 <i className="fas fa-users mr-3"></i>
-                <span>All Users</span>
+                <span>Customer Users</span>
               </Link>
             </li>
+            {canWrite && (
+              <li>
+                <Link
+                  to="/dashboard-users"
+                  className={`flex items-center px-4 py-2 text-sm rounded-md ${
+                    isActive('/dashboard-users') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <i className="fas fa-user-shield mr-3"></i>
+                  <span>Dashboard Users</span>
+                </Link>
+              </li>
+            )}
             
             {/* System Reports */}
             <li>
@@ -453,7 +467,12 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
-        <header className="bg-white border-b border-gray-200 px-6 py-3 flex justify-end">
+        <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+          {isReadOnly ? (
+            <div className="px-3 py-2 text-sm font-medium text-amber-900 bg-amber-100 border border-amber-300 rounded">
+              Read-only access: you can view data, but cannot make changes.
+            </div>
+          ) : <div />}
           <button onClick={handleLogout} className="px-3 py-1.5 text-sm text-white bg-red-600 rounded hover:bg-red-700 transition">
             <i className="fas fa-sign-out-alt mr-1"></i> Logout
           </button>

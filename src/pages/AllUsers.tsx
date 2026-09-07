@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import Table from '../components/Table'
 import Pagination from '../components/Pagination'
 import { usersApi, ApiUser } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 type User = ApiUser
 
 export default function AllUsers() {
   const navigate = useNavigate()
+  const { canWrite } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -35,14 +37,13 @@ export default function AllUsers() {
     { key: 'id' as keyof User, header: 'ID', className: 'text-center' },
     { key: 'mobile' as keyof User, header: 'Mobile' },
     { key: 'name' as keyof User, header: 'Name' },
-    { key: 'mpin' as keyof User, header: 'MPin' },
     { 
       key: 'walletBalance' as keyof User, 
       header: 'Wallet',
       render: (value: number, row: User) => (
         <span>
           {value}{' '}
-          <button 
+          {canWrite && <button
             onClick={(e) => { 
               e.stopPropagation()
               setSelectedUser(row)
@@ -53,7 +54,7 @@ export default function AllUsers() {
             className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition"
           >
             <i className="fas fa-edit"></i>
-          </button>
+          </button>}
         </span>
       )
     },
@@ -61,14 +62,14 @@ export default function AllUsers() {
     { 
       key: 'isBanned' as keyof User, 
       header: 'Active',
-      render: (value: boolean, row: User) => (
+      render: (value: boolean, row: User) => canWrite ? (
         <button 
           onClick={(e) => { e.stopPropagation(); usersApi.toggleBan(row.id).then(() => loadUsers(currentPage)).catch(console.error) }}
           className={`px-2 py-1 text-xs text-white rounded ${value ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
         >
           {value ? 'Unblock' : 'Block'}
         </button>
-      )
+      ) : <span className="text-xs text-gray-600">{value ? 'Banned' : 'Active'}</span>
     },
     { 
       key: 'id' as keyof User, 
@@ -96,16 +97,16 @@ export default function AllUsers() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">All Users</h2>
-        <button 
+        <h2 className="text-2xl font-bold text-gray-800">Customer Users</h2>
+        {canWrite && <button
           onClick={() => {
             setNewUser({ name: '', mobile: '', mpin: '' })
             setCreateModalOpen(true)
           }}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition"
         >
-          Create User
-        </button>
+          Create Customer
+        </button>}
       </div>
       
       {loading ? (
@@ -126,11 +127,11 @@ export default function AllUsers() {
         onPageChange={setCurrentPage}
       />
 
-      {createModalOpen && (
+      {canWrite && createModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h4 className="text-lg font-semibold text-gray-800">Create User</h4>
+              <h4 className="text-lg font-semibold text-gray-800">Create Customer</h4>
               <button 
                 onClick={() => setCreateModalOpen(false)}
                 className="text-gray-500 hover:text-gray-700 text-2xl"
@@ -183,7 +184,7 @@ export default function AllUsers() {
                   }}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition"
                 >
-                  Create User
+                  Create Customer
                 </button>
               </div>
             </div>
@@ -191,7 +192,7 @@ export default function AllUsers() {
         </div>
       )}
 
-      {modalOpen && selectedUser && (
+      {canWrite && modalOpen && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { settingsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function ManageSettings() {
+  const { canWrite } = useAuth()
   const [homescreenText, setHomescreenText] = useState('')
   const [newRegistration, setNewRegistration] = useState('1')
   const [landingPage, setLandingPage] = useState('0')
@@ -65,6 +67,7 @@ export default function ManageSettings() {
             }}
             className="space-y-4"
           >
+            <fieldset disabled={!canWrite} className="space-y-4">
             <div>
               <label htmlFor="homescreen_text" className="block text-sm font-medium text-gray-700 mb-1">Homescreen text</label>
               <input type="text" id="homescreen_text" value={homescreenText} onChange={(e) => setHomescreenText(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded text-sm" />
@@ -139,6 +142,7 @@ export default function ManageSettings() {
               <input type="text" id="withdraw_msg" value={withdrawMsg} onChange={(e) => setWithdrawMsg(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded text-sm" />
             </div>
             <button type="submit" disabled={submitting} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition disabled:opacity-60">{submitting ? 'Updating…' : 'Update'}</button>
+            </fieldset>
           </form>
         </div>
       </div>
