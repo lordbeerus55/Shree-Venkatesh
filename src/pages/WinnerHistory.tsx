@@ -10,6 +10,13 @@ const bidTypes = [
   { value: 'sangam', label: 'Sangam' },
 ]
 
+const gameTypesByFilter: Record<string, string[]> = {
+  single: ['single'],
+  jodi: ['jodi'],
+  pana: ['single_pana', 'double_pana', 'triple_pana', 'sp', 'dp', 'tp', 'fp', 'cp'],
+  sangam: ['half_sangam', 'full_sangam'],
+}
+
 export default function WinnerHistory() {
   const [winnings, setWinnings] = useState<ApiBid[]>([])
   const [total, setTotal] = useState(0)
@@ -25,7 +32,7 @@ export default function WinnerHistory() {
   }, [currentPage, pageSize])
 
   const filtered = useMemo(() => {
-    let data = bidType !== 'all' ? winnings.filter((w) => w.gameType === bidType) : winnings
+    let data = bidType !== 'all' ? winnings.filter((w) => gameTypesByFilter[bidType].includes(w.gameType)) : winnings
     if (search) data = data.filter((w) =>
       [w.user?.mobile, w.user?.name, w.gameType, w.market?.name, w.number]
         .some((v) => v?.toLowerCase().includes(search.toLowerCase()))
@@ -115,8 +122,8 @@ export default function WinnerHistory() {
                   <td className="px-4 py-2 border border-gray-300">{row.market?.name}</td>
                   <td className="px-4 py-2 border border-gray-300">{row.session}</td>
                   <td className="px-4 py-2 border border-gray-300">{row.number}</td>
-                  <td className="px-4 py-2 border border-gray-300">{row.amount.toFixed(2)}</td>
-                  <td className="px-4 py-2 border border-gray-300">—</td>
+                  <td className="px-4 py-2 border border-gray-300">{Number(row.amount).toFixed(2)}</td>
+                  <td className="px-4 py-2 border border-gray-300">{Number(row.winningAmount ?? 0).toFixed(2)}</td>
                   <td className="px-4 py-2 border border-gray-300">{row.gameType}</td>
                   <td className="px-4 py-2 border border-gray-300">{new Date(row.createdAt).toLocaleDateString()}</td>
                 </tr>

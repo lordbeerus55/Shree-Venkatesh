@@ -9,6 +9,7 @@ import {
 
 const router = Router()
 const COMBINED_GAME_TYPES = ['jodi', 'half_sangam', 'full_sangam']
+const WITHDRAW_METHODS = ['UPI', 'PhonePe', 'Google Pay', 'Paytm', 'Bank Transfer']
 
 function rejectUserId(req: Request, res: Response, next: NextFunction): void {
   if (Object.prototype.hasOwnProperty.call(req.body ?? {}, 'userId') || Object.prototype.hasOwnProperty.call(req.query, 'userId')) {
@@ -227,13 +228,15 @@ router.post('/withdrawals', async (req: Request, res: Response) => {
   const accountNumber = typeof req.body.accountNumber === 'string' ? req.body.accountNumber.trim() : ''
   const ifscCode = typeof req.body.ifscCode === 'string' ? req.body.ifscCode.trim().toUpperCase() : ''
   const upiId = typeof req.body.upiId === 'string' ? req.body.upiId.trim() : ''
-  const validPayment = /^[\w.-]{2,128}@[\w.-]{2,128}$/.test(upiId) ||
-    (accountHolder.length >= 2 && accountHolder.length <= 100 && /^\d{6,34}$/.test(accountNumber) && /^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifscCode))
+  const paymentMethod = typeof req.body.paymentMethod === 'string' && req.body.paymentMethod.trim() ? req.body.paymentMethod.trim() : 'UPI'
+  const validPayment = paymentMethod === 'Bank Transfer'
+    ? accountHolder.length >= 2 && accountHolder.length <= 100 && /^\d{6,34}$/.test(accountNumber) && /^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifscCode)
+    : WITHDRAW_METHODS.includes(paymentMethod) && /^[\w.-]{2,128}@[\w.-]{2,128}$/.test(upiId)
   if (!amount || !idempotencyKey || !validPayment) { res.status(400).json({ error: 'Invalid withdrawal data' }); return }
   const userId = req.customer!.id
-  const matches = (item: { amount: Prisma.Decimal; accountHolder: string | null; accountNumber: string | null; ifscCode: string | null; upiId: string | null }) =>
+  const matches = (item: { amount: Prisma.Decimal; accountHolder: string | null; accountNumber: string | null; ifscCode: string | null; upiId: string | null; paymentMethod: string | null }) =>
     item.amount.equals(amount) && (item.accountHolder ?? '') === accountHolder && (item.accountNumber ?? '') === accountNumber &&
-    (item.ifscCode ?? '') === ifscCode && (item.upiId ?? '') === upiId
+    (item.ifscCode ?? '') === ifscCode && (item.upiId ?? '') === upiId && (item.paymentMethod ?? 'UPI') === paymentMethod
   try {
     const outcome = await serializable(async (tx) => {
       const existing = await tx.withdrawRequest.findUnique({ where: { userId_idempotencyKey: { userId, idempotencyKey } } })
@@ -242,7 +245,7 @@ router.post('/withdrawals', async (req: Request, res: Response) => {
       if (!balance || balance.walletBalance.lessThan(amount)) throw new Error('INSUFFICIENT_FUNDS')
       const after = balance.walletBalance.minus(amount)
       const withdrawal = await tx.withdrawRequest.create({
-        data: { userId, amount, accountHolder: accountHolder || null, accountNumber: accountNumber || null, ifscCode: ifscCode || null, upiId: upiId || null, idempotencyKey, fundsReserved: true },
+        data: { userId, amount, accountHolder: accountHolder || null, accountNumber: accountNumber || null, ifscCode: ifscCode || null, upiId: upiId || null, paymentMethod, idempotencyKey, fundsReserved: true },
       })
       await tx.user.update({ where: { id: userId }, data: { walletBalance: after, fundsReserved: { increment: amount } } })
       await tx.walletTransaction.create({

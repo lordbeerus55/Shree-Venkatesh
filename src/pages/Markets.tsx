@@ -47,7 +47,10 @@ export default function Markets() {
   const handleAddMarket = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
-    await marketsApi.create({ name: fd.get('game_name') as string, type: 'main' }).catch((err) => alert(err.message))
+    const openTime = to12Hour(fd.get('open_time') as string)
+    const closeTime = to12Hour(fd.get('close_time') as string)
+    const schedules = days.map((dayOfWeek) => ({ dayOfWeek, openTime, closeTime, isActive: true }))
+    await marketsApi.create({ name: fd.get('game_name') as string, type: 'main', schedules }).catch((err) => alert(err.message))
     load(); setAddModalOpen(false)
   }
 

@@ -183,6 +183,7 @@ model WithdrawRequest {
   accountNumber  String?
   ifscCode       String?
   upiId          String?
+  paymentMethod  String?
   idempotencyKey String?
   fundsReserved  Boolean   @default(false)
   status         String    @default("pending")

@@ -3,7 +3,7 @@ import Pagination from '../components/Pagination'
 import { depositsApi, ApiDeposit } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 
-const today = new Date().toISOString().split('T')[0]
+const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
 
 const statusOptions = [
   { value: 'all', label: 'All' },

@@ -21,6 +21,15 @@ export function parseDate(value: unknown): Date | null {
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value ? date : null
 }
 
+export function istToday(now = new Date()): Date {
+  return new Date(`${new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(now)}T00:00:00.000Z`)
+}
+
+export function istDayRange(day: Date): { gte: Date; lt: Date } {
+  const start = new Date(day.getTime() - 19800000)
+  return { gte: start, lt: new Date(start.getTime() + 86400000) }
+}
+
 export const MAX_BALANCE = new Prisma.Decimal('9999999999.99')
 
 export function parseAmount(value: unknown, maximum = '99999999.99'): Prisma.Decimal | null {

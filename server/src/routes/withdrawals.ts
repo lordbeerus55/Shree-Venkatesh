@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import { Router, Request, Response } from 'express'
 import prisma from '../lib/prisma'
 import { lockUser, serializable } from '../lib/transactions'
-import { MAX_BALANCE, parseDate, parseId, parsePage } from '../lib/validation'
+import { MAX_BALANCE, istDayRange, parseDate, parseId, parsePage } from '../lib/validation'
 
 const router = Router()
 
@@ -15,7 +15,7 @@ router.get('/', async (req: Request, res: Response) => {
   }
   const where: Prisma.WithdrawRequestWhereInput = {
     ...(req.query.status ? { status: String(req.query.status) } : {}),
-    ...(startDate || endDate ? { createdAt: { ...(startDate ? { gte: startDate } : {}), ...(endDate ? { lte: endDate } : {}) } } : {}),
+    ...(startDate || endDate ? { createdAt: { ...(startDate ? { gte: istDayRange(startDate).gte } : {}), ...(endDate ? { lt: istDayRange(endDate).lt } : {}) } } : {}),
   }
   const [requests, total] = await Promise.all([
     prisma.withdrawRequest.findMany({ where, include: { user: { select: { id: true, name: true, mobile: true, walletBalance: true, fundsReserved: true } } }, orderBy: { createdAt: 'desc' }, skip: pagination.skip, take: pagination.limit }),

@@ -128,7 +128,7 @@ export const customerApi = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-  bids: () => customerRequest<CustomerBid[] | { bids: CustomerBid[] }>('/bids'),
+  bids: (status?: string) => customerRequest<CustomerBid[] | { bids: CustomerBid[] }>(`/bids${status ? `?status=${status}` : ''}`),
   wallet: () => customerRequest<
     WalletTransaction[] | { transactions?: WalletTransaction[]; balance?: number; walletBalance?: number }
   >('/wallet'),
@@ -144,6 +144,7 @@ export const customerApi = {
     accountNumber?: string
     ifscCode?: string
     upiId?: string
+    paymentMethod?: string
     idempotencyKey: string
   }) => customerRequest<MoneyRequest>('/withdrawals', {
     method: 'POST',

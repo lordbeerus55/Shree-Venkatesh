@@ -165,7 +165,7 @@ export interface ApiMarket {
 
 export const marketsApi = {
   list: () => request<ApiMarket[]>('/markets'),
-  create: (data: { name: string; type: string }) =>
+  create: (data: { name: string; type: string; schedules?: { dayOfWeek: string; openTime: string; closeTime: string; isActive: boolean }[] }) =>
     request<ApiMarket>('/markets', { method: 'POST', body: JSON.stringify(data) }),
   update: (id: number, data: Partial<ApiMarket>) =>
     request<ApiMarket>(`/markets/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
@@ -223,6 +223,7 @@ export interface ApiBid {
   gameType: string
   number: string
   amount: number
+  winningAmount?: number | string
   status: string
   createdAt: string
   user: { id: number; name: string; mobile: string }
@@ -297,6 +298,7 @@ export interface ApiWithdrawal {
   accountNumber: string
   ifscCode: string
   upiId: string
+  paymentMethod?: string
   status: string
   adminRemark: string
   createdAt: string

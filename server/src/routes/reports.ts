@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express'
 import prisma from '../lib/prisma'
+import { istDayRange, istToday, parseDate } from '../lib/validation'
 
 const router = Router()
 
@@ -10,6 +11,7 @@ router.get('/dashboard', async (req: Request, res: Response) => {
   startOfDay.setHours(0, 0, 0, 0)
   const endOfDay = new Date(targetDate)
   endOfDay.setHours(23, 59, 59, 999)
+  const moneyDay = istDayRange((typeof date === 'string' && parseDate(date)) || istToday())
 
   const [
     totalUsers,
@@ -32,11 +34,11 @@ router.get('/dashboard', async (req: Request, res: Response) => {
       _sum: { winningAmount: true },
     }),
     prisma.depositRequest.aggregate({
-      where: { status: 'approved', processedAt: { gte: startOfDay, lte: endOfDay } },
+      where: { status: 'approved', processedAt: moneyDay },
       _sum: { amount: true },
     }),
     prisma.withdrawRequest.aggregate({
-      where: { status: 'approved', processedAt: { gte: startOfDay, lte: endOfDay } },
+      where: { status: 'approved', processedAt: moneyDay },
       _sum: { amount: true },
     }),
     prisma.user.aggregate({ _sum: { walletBalance: true } }),

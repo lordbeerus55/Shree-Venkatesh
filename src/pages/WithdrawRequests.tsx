@@ -3,7 +3,7 @@ import Pagination from '../components/Pagination'
 import { withdrawalsApi, ApiWithdrawal } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 
-const today = new Date().toISOString().split('T')[0]
+const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
 
 const statusOptions = [
   { value: 'all', label: 'All' },
@@ -164,7 +164,7 @@ export default function WithdrawRequests() {
                     </td>
                     <td className="px-4 py-2 border border-gray-300">{new Date(r.createdAt).toLocaleDateString()}</td>
                     <td className="px-4 py-2 border border-gray-300">
-                      <span className="text-xs text-gray-600">{r.accountHolder || r.upiId || '—'}</span>
+                      <span className="text-xs text-gray-600">{[r.paymentMethod, r.accountHolder || r.upiId].filter(Boolean).join(' · ') || '—'}</span>
                     </td>
                     <td className="px-4 py-2 border border-gray-300 space-x-1">
                       {canWrite && r.status === 'pending' && <>
