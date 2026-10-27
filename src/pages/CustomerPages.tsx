@@ -190,10 +190,71 @@ export function CustomerRegister() {
   )
 }
 
+function resultDayKey(result: CustomerResult) {
+  return (result.resultDate || result.date || '').slice(0, 10)
+}
+
+function dayLabel(key: string) {
+  if (!key) return 'Unknown date'
+  return new Date(`${key}T00:00:00Z`).toLocaleDateString('en-IN', { timeZone: 'UTC', weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+function ResultsHistory() {
+  const [results, setResults] = useState<CustomerResult[]>([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    setLoading(true)
+    customerApi.results(page)
+      .then((response) => {
+        setTotal(response.total)
+        setResults((previous) => (page === 1 ? response.results : [...previous, ...response.results]))
+      })
+      .catch((err) => setError(message(err)))
+      .finally(() => setLoading(false))
+  }, [page])
+
+  const groups = useMemo(() => {
+    const byDay = new Map<string, CustomerResult[]>()
+    for (const result of results) {
+      const key = resultDayKey(result)
+      byDay.set(key, [...(byDay.get(key) || []), result])
+    }
+    return [...byDay.entries()]
+  }, [results])
+
+  return (
+    <div className="space-y-5">
+      {error && <div className="rounded-lg bg-red-50 p-3 text-red-700">{error}</div>}
+      {groups.map(([day, dayResults]) => (
+        <div key={day || 'unknown'}>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">{dayLabel(day)}</h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {dayResults.map((result) => (
+              <div key={result.id} className={cardClass}>
+                <p className="text-sm font-semibold text-indigo-900">{result.market?.name || result.marketName || 'Market'}</p>
+                <p className="mt-2 text-xl font-bold text-indigo-800">{resultText(result)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      {!loading && !results.length && !error && <p className="text-slate-500">No results have been declared.</p>}
+      {results.length < total && (
+        <button onClick={() => setPage((current) => current + 1)} disabled={loading} className="w-full rounded-lg border border-indigo-300 bg-white px-4 py-2.5 font-semibold text-indigo-800 hover:bg-indigo-50 disabled:opacity-60">
+          {loading ? 'Loading…' : 'Load older results'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 export function CustomerHome() {
   const { customer, refreshCustomer } = useCustomerAuth()
   const [markets, setMarkets] = useState<CustomerMarket[]>([])
-  const [results, setResults] = useState<CustomerResult[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [, setNow] = useState(Date.now())
@@ -204,10 +265,9 @@ export function CustomerHome() {
   }, [])
 
   useEffect(() => {
-    Promise.all([customerApi.markets(), customerApi.results(), refreshCustomer()])
-      .then(([marketResponse, resultResponse]) => {
+    Promise.all([customerApi.markets(), refreshCustomer()])
+      .then(([marketResponse]) => {
         setMarkets(unwrapList(marketResponse, 'markets').filter((market) => market.isActive))
-        setResults(unwrapList(resultResponse, 'results'))
       })
       .catch((err) => setError(message(err)))
       .finally(() => setLoading(false))
@@ -231,8 +291,8 @@ export function CustomerHome() {
             const status = marketStatus(market)
             const schedule = todaySchedule(market)
             return (
-            <Link key={market.id} to={`/play/market/${market.id}`} className={`${cardClass} transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md`}>
-              <div className="flex items-start justify-between gap-2"><h3 className="font-bold text-slate-900">{market.name}</h3><span className={`rounded-full px-2 py-1 text-xs font-medium ${status.tone}`}>{status.label}</span></div>
+            <Link key={market.id} to={`/play/market/${market.id}`} className={`rounded-xl border border-violet-200 bg-violet-100 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-400 hover:shadow-md`}>
+              <div className="flex items-start justify-between gap-2"><h3 className="text-lg font-extrabold text-orange-600">{market.name}</h3><span className={`rounded-full px-2 py-1 text-xs font-medium ${status.tone}`}>{status.label}</span></div>
               <p className="mt-2 text-sm text-slate-700">{schedule ? `Open ${schedule.openTime} · Close ${schedule.closeTime}` : 'No timing today'}</p>
               <p className="mt-1 text-xs text-slate-500">{market.type || 'Market'} · {status.canBid ? 'Tap to place a bid' : 'Bidding closed'}</p>
             </Link>
@@ -243,16 +303,8 @@ export function CustomerHome() {
       </section>
 
       <section>
-        <div className="mb-3 flex items-center justify-between"><h2 className="text-xl font-bold">Declared results</h2><Link to="/play/results" className="text-sm text-indigo-700 hover:underline">View all</Link></div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {results.slice(0, 6).map((result) => (
-            <div key={result.id} className={cardClass}>
-              <p className="text-sm text-slate-500">{result.market?.name || result.marketName || 'Market'} · {displayDate(result.resultDate || result.date)}</p>
-              <p className="mt-2 text-xl font-bold text-indigo-800">{resultText(result)}</p>
-            </div>
-          ))}
-          {!results.length && <p className="text-slate-500">No results have been declared.</p>}
-        </div>
+        <div className="mb-3 flex items-center justify-between"><h2 className="text-xl font-bold">Declared results</h2><Link to="/play/results" className="text-sm text-indigo-700 hover:underline">Full history</Link></div>
+        <ResultsHistory />
       </section>
     </div>
   )
@@ -343,27 +395,49 @@ export function CustomerMarketPage() {
 
 export function CustomerBids() {
   const [bids, setBids] = useState<CustomerBid[]>([])
+  const [total, setTotal] = useState(0)
   const [status, setStatus] = useState('')
+  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  useEffect(() => { customerApi.bids(status || undefined).then((response) => setBids(unwrapList(response, 'bids'))).catch((err) => setError(message(err))) }, [status])
+
+  useEffect(() => {
+    setLoading(true)
+    customerApi.bids(status || undefined, page)
+      .then((response) => {
+        setTotal(response.total)
+        setBids((previous) => (page === 1 ? response.bids : [...previous, ...response.bids]))
+      })
+      .catch((err) => setError(message(err)))
+      .finally(() => setLoading(false))
+  }, [status, page])
+
+  const changeStatus = (next: string) => { setBids([]); setPage(1); setStatus(next) }
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2"><label htmlFor="bid-status-filter" className="text-sm font-medium">Show</label><select id="bid-status-filter" className="rounded-lg border border-slate-300 bg-white px-3 py-2" value={status} onChange={(event) => setStatus(event.target.value)}><option value="">All bids</option><option value="pending">Pending</option><option value="won">Won</option><option value="lost">Lost</option><option value="reverted">Reverted</option></select></div>
-      <ListPage title={status === 'won' ? 'Win history' : 'My bids'} error={error}>{bids.map((bid) => <div key={bid.id} className={cardClass}><div className="flex justify-between gap-3"><div><h3 className="font-bold">{bid.market?.name || bid.marketName || 'Market'}</h3><p className="text-sm text-slate-500">{bid.gameType} · {bid.session} · {bid.number}</p></div><div className="text-right"><p className="font-bold">₹{Number(bid.amount).toFixed(2)}</p><p className={`text-xs font-semibold uppercase ${bid.status === 'won' ? 'text-green-700' : 'text-slate-500'}`}>{bid.status}{bid.status === 'won' && ` · ₹${Number(bid.winningAmount ?? 0).toFixed(2)}`}</p></div></div><p className="mt-3 text-xs text-slate-400">{displayDate(bid.bidDate || bid.createdAt)}</p></div>)}</ListPage>
+      <div className="flex items-center gap-2"><label htmlFor="bid-status-filter" className="text-sm font-medium">Show</label><select id="bid-status-filter" className="rounded-lg border border-slate-300 bg-white px-3 py-2" value={status} onChange={(event) => changeStatus(event.target.value)}><option value="">All bids</option><option value="pending">Pending</option><option value="won">Won (win history)</option><option value="lost">Lost</option><option value="reverted">Reverted</option></select><span className="text-sm text-slate-500">{total} record{total === 1 ? '' : 's'}</span></div>
+      {error && <div className="rounded-lg bg-red-50 p-3 text-red-700">{error}</div>}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {bids.map((bid) => <div key={bid.id} className={cardClass}><div className="flex justify-between gap-3"><div><h3 className="font-bold">{bid.market?.name || bid.marketName || 'Market'}</h3><p className="text-sm text-slate-500">{bid.gameType} · {bid.session} · {bid.number}</p></div><div className="text-right"><p className="font-bold">₹{Number(bid.amount).toFixed(2)}</p><p className={`text-xs font-semibold uppercase ${bid.status === 'won' ? 'text-green-700' : 'text-slate-500'}`}>{bid.status}{bid.status === 'won' && ` · ₹${Number(bid.winningAmount ?? 0).toFixed(2)}`}</p></div></div><p className="mt-3 text-xs text-slate-400">{displayDate(bid.bidDate || bid.createdAt)}</p></div>)}
+        {!loading && !bids.length && !error && <p className="text-slate-500">No records found.</p>}
+      </div>
+      {bids.length < total && (
+        <button onClick={() => setPage((current) => current + 1)} disabled={loading} className="w-full rounded-lg border border-indigo-300 bg-white px-4 py-2.5 font-semibold text-indigo-800 hover:bg-indigo-50 disabled:opacity-60">
+          {loading ? 'Loading…' : 'Load more'}
+        </button>
+      )}
     </div>
   )
 }
 
 export function CustomerResults() {
-  const [results, setResults] = useState<CustomerResult[]>([])
-  const [error, setError] = useState('')
-  useEffect(() => { customerApi.results().then((response) => setResults(unwrapList(response, 'results'))).catch((err) => setError(message(err))) }, [])
-  return <ListPage title="Results" error={error}>{results.map((result) => <div key={result.id} className={cardClass}><p className="text-sm text-slate-500">{result.market?.name || result.marketName || 'Market'}</p><p className="my-2 text-2xl font-bold text-indigo-800">{resultText(result)}</p><p className="text-xs text-slate-400">{displayDate(result.resultDate || result.date)}</p></div>)}</ListPage>
-}
-
-function ListPage({ title, error, children }: { title: string; error: string; children: React.ReactNode }) {
-  const count = useMemo(() => Array.isArray(children) ? children.length : children ? 1 : 0, [children])
-  return <div><h2 className="mb-4 text-2xl font-bold">{title}</h2>{error && <div className="mb-4 rounded-lg bg-red-50 p-3 text-red-700">{error}</div>}<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{children}{!count && !error && <p className="text-slate-500">No records found.</p>}</div></div>
+  return (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold">Results</h2>
+      <ResultsHistory />
+    </div>
+  )
 }
 
 export function CustomerWallet() {

@@ -122,13 +122,13 @@ export const customerApi = {
   me: () => customerRequest<Customer>('/me'),
   markets: () => customerRequest<CustomerMarket[] | { markets: CustomerMarket[] }>('/markets'),
   rates: () => customerRequest<Record<string, number> | { rates: Record<string, number> }>('/rates'),
-  results: () => customerRequest<CustomerResult[] | { results: CustomerResult[] }>('/results'),
+  results: (page = 1) => customerRequest<{ results: CustomerResult[]; total: number }>(`/results?page=${page}`),
   placeBid: (data: BidPayload) =>
     customerRequest<CustomerBid>('/bids', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-  bids: (status?: string) => customerRequest<CustomerBid[] | { bids: CustomerBid[] }>(`/bids${status ? `?status=${status}` : ''}`),
+  bids: (status?: string, page = 1) => customerRequest<{ bids: CustomerBid[]; total: number }>(`/bids?page=${page}${status ? `&status=${status}` : ''}`),
   wallet: () => customerRequest<
     WalletTransaction[] | { transactions?: WalletTransaction[]; balance?: number; walletBalance?: number }
   >('/wallet'),
