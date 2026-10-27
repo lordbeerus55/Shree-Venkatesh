@@ -58,7 +58,19 @@ export default function Markets() {
     e.preventDefault()
     if (!marketModal) return
     const fd = new FormData(e.currentTarget)
-    await marketsApi.update(marketModal.id, { name: fd.get('name') as string }).catch((err) => alert(err.message))
+    const openRaw = fd.get('open') as string
+    const closeRaw = fd.get('close') as string
+    if (Boolean(openRaw) !== Boolean(closeRaw)) return alert('Enter both open and close time, or leave both empty.')
+    try {
+      await marketsApi.update(marketModal.id, { name: fd.get('name') as string, isActive: fd.get('active') === 'yes' })
+      if (openRaw && closeRaw) {
+        const openTime = to12Hour(openRaw)
+        const closeTime = to12Hour(closeRaw)
+        await Promise.all(marketModal.schedules.map((s) => marketsApi.updateSchedule(marketModal.id, s.id, { openTime, closeTime })))
+      }
+    } catch (err) {
+      return alert(err instanceof Error ? err.message : 'Update failed')
+    }
     load(); setMarketModal(null)
   }
 
@@ -287,12 +299,13 @@ export default function Markets() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Market Active</label>
                 <select
                   name="active"
-                  defaultValue="yes"
+                  defaultValue={marketModal.isActive ? 'yes' : 'no'}
                   className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                 >
                   <option value="no">No</option>
                   <option value="yes">Yes</option>
                 </select>
+                <p className="mt-1 text-xs text-gray-500">Applies to the whole market. Open/close times apply to all seven days; leave empty to keep existing times.</p>
               </div>
               <div className="flex justify-end gap-2 mt-4">
                 <button type="submit" className="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700">Update Game</button>
